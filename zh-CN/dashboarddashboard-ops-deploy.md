@@ -55,11 +55,11 @@ http://192.168.0.123:2379/dashboard/
 
 > 
 > ```shell
-tiup update --self
-tiup update cluster --force
-```
-
-</details>
+> tiup update --self
+> tiup update cluster --force
+> ```
+> 
+> </details>
 
 ### 切换其他 PD 实例提供 TiDB Dashboard 服务
 
