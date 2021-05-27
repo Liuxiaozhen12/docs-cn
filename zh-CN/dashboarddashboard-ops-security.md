@@ -55,11 +55,11 @@ tiup cluster display CLUSTER_NAME --dashboard
 
 > 
 > ```shell
-tiup update --self
-tiup update cluster --force
-```
-
-</details>
+> tiup update --self
+> tiup update cluster --force
+> ```
+> 
+> </details>
 
 以下是一个样例输出：
 
