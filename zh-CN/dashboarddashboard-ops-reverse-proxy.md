@@ -35,16 +35,16 @@ http://192.168.0.123:2379/dashboard/
 
 > 
 > ```shell
-tiup update --self
-tiup update cluster --force
-```
-
-</details>
+> tiup update --self
+> tiup update cluster --force
+> ```
+> 
+> </details>
 
 ### 第 2 步：配置反向代理
 
-<details mark="crwd-mark">
-<summary mark="crwd-mark">使用 HAProxy 反向代理</summary>
+<details>
+<summary>使用 HAProxy 反向代理</summary>
 
 [HAProxy](https://www.haproxy.org/) 作为反向代理时，方法如下：
 
