@@ -14,6 +14,7 @@ TiDB 系统变量的行为与 MySQL 相似但有一些不同，变量的作用�
 
 - 对 `GLOBAL` 作用域变量的更改，设置后**只对新 TiDB 连接会话生效**，当前活动连接会话不受影响。更改会被持久化，重启后仍然生效。
 - 对 `INSTANCE` 作用域变量的更改，设置后会立即对当前 TiDB 实例所有活动连接会话或新连接会话生效，其他 TiDB 实例不生效。更改**不会**被持久化，重启 TiDB 后会**失效**。
+- 作用域为 `NONE` 的变量为只读变量，通常用于展示 TiDB 服务器启动后不会改变的静态信息。
 
 使用 [`SET` 语句](/sql-statements/sql-statement-set-variable.md)可以设置变量的作用范围为全局级别、实例级别或会话级别。
 
@@ -83,6 +84,12 @@ mysql> SELECT * FROM t1;
 - 作用域：SESSION | GLOBAL
 - 默认值：ON
 - 用于设置在非显式事务时是否自动提交事务。更多信息，请参见[事务概述](/transaction-overview.md#自动提交)。
+
+### `cte_max_recursion_depth`
+
+- 作用域：SESSION | GLOBAL
+- 默认值：1000
+- 这个变量用于控制公共表表达式的最大递归深度。
 
 ### `ddl_slow_threshold`
 
@@ -349,7 +356,7 @@ mysql> SELECT * FROM t1;
 - 默认值：256
 - 这个变量用来设置 DDL 操作 `re-organize` 阶段的 batch size。比如 `ADD INDEX` 操作，需要回填索引数据，通过并发 `tidb_ddl_reorg_worker_cnt` 个 worker 一起回填数据，每个 worker 以 batch 为单位进行回填。
 
-    - 如果 `ADD INDEX` 操作时有较多 `UPDATA` 操作或者 `REPLACE` 等更新操作，batch size 越大，事务冲突的概率也会越大，此时建议调小 batch size 的值，最小值是 32。
+    - 如果 `ADD INDEX` 操作时有较多 `UPDATE` 操作或者 `REPLACE` 等更新操作，batch size 越大，事务冲突的概率也会越大，此时建议调小 batch size 的值，最小值是 32。
     - 在没有事务冲突的情况下，batch size 可设为较大值，最大值是 10240，这样回填数据的速度更快，但是 TiKV 的写入压力也会变大。
 
 ### `tidb_ddl_reorg_priority`
@@ -456,6 +463,17 @@ mysql> SELECT * FROM t1;
 - 作用域：INSTANCE
 - 默认值：ON
 - 这个变量用于控制是否同时将各个执行算子的执行信息记录入 slow query log 中。
+
+### `tidb_enable_enhanced_security`
+
+- 作用域：NONE
+- 默认值：OFF
+- 这个变量表示所连接的 TiDB 服务器是否启用了安全增强模式 (SEM)。若要改变该变量值，你需要在 TiDB 服务器的配置文件中修改 `enable-sem` 项的值，并重启 TiDB 服务器。
+- 安全增强模式受[安全增强式 Linux](https://zh.wikipedia.org/wiki/安全增强式Linux) 等系统设计的启发，削减拥有 MySQL `SUPER` 权限的用户能力，转而使用细粒度的 `RESTRICTED` 权限作为替代。这些细粒度的 `RESTRICTED` 权限如下：
+    - `RESTRICTED_TABLES_ADMIN`：能够写入 `mysql` 库中的系统表，能查看 `information_schema` 表上的敏感列。
+    - `RESTRICTED_STATUS_ADMIN`：能够在 `SHOW STATUS` 命令中查看敏感内容。
+    - `RESTRICTED_VARIABLES_ADMIN`：能够在 `SHOW [GLOBAL] VARIABLES` 和 `SET` 命令中查看和设置包含敏感内容的变量。
+    - `RESTRICTED_USER_ADMIN`：能够阻止其他用户更改或删除用户帐户。
 
 ### `tidb_enable_fast_analyze`
 
